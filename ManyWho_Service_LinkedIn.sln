@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManyWho.Service.LinkedIn", "ManyWho_Service_LinkedIn\ManyWho.Service.LinkedIn.csproj", "{FDBA1EF2-358E-41B6-9917-415864A4A782}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FDBA1EF2-358E-41B6-9917-415864A4A782}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDBA1EF2-358E-41B6-9917-415864A4A782}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDBA1EF2-358E-41B6-9917-415864A4A782}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDBA1EF2-358E-41B6-9917-415864A4A782}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
