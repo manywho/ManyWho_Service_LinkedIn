@@ -64,65 +64,65 @@ namespace ManyWho.Service.LinkedIn
             //    }
             //);
 
-            //config.Routes.MapHttpRoute(
-            //    name: "PluginLinkedInGetUserInAuthorizationContext",
-            //    routeTemplate: "plugins/api/linkedin/1/authorization",
-            //    defaults: new
-            //    {
-            //        controller = "PluginLinkedIn",
-            //        action = "GetUserInAuthorizationContext"
-            //    }
-            //);
+            config.Routes.MapHttpRoute(
+                name: "PluginLinkedInGetUserInAuthorizationContext",
+                routeTemplate: "plugins/api/linkedin/1/authorization",
+                defaults: new
+                {
+                    controller = "PluginLinkedIn",
+                    action = "GetUserInAuthorizationContext"
+                }
+            );
 
-            //config.Routes.MapHttpRoute(
-            //    name: "PluginLinkedInLoadUserAttributes",
-            //    routeTemplate: "plugins/api/linkedin/1/authorization/user/attribute",
-            //    defaults: new
-            //    {
-            //        controller = "PluginLinkedIn",
-            //        action = "LoadUserAttributes"
-            //    }
-            //);
+            config.Routes.MapHttpRoute(
+                name: "PluginLinkedInLoadUserAttributes",
+                routeTemplate: "plugins/api/linkedin/1/authorization/user/attribute",
+                defaults: new
+                {
+                    controller = "PluginLinkedIn",
+                    action = "LoadUserAttributes"
+                }
+            );
 
-            //config.Routes.MapHttpRoute(
-            //    name: "PluginLinkedInLoadGroupAttributes",
-            //    routeTemplate: "plugins/api/linkedin/1/authorization/group/attribute",
-            //    defaults: new
-            //    {
-            //        controller = "PluginLinkedIn",
-            //        action = "LoadGroupAttributes"
-            //    }
-            //);
+            config.Routes.MapHttpRoute(
+                name: "PluginLinkedInLoadGroupAttributes",
+                routeTemplate: "plugins/api/linkedin/1/authorization/group/attribute",
+                defaults: new
+                {
+                    controller = "PluginLinkedIn",
+                    action = "LoadGroupAttributes"
+                }
+            );
 
-            //config.Routes.MapHttpRoute(
-            //    name: "PluginLinkedInLoadUsers",
-            //    routeTemplate: "plugins/api/linkedin/1/authorization/user",
-            //    defaults: new
-            //    {
-            //        controller = "PluginLinkedIn",
-            //        action = "LoadUsers"
-            //    }
-            //);
+            config.Routes.MapHttpRoute(
+                name: "PluginLinkedInLoadUsers",
+                routeTemplate: "plugins/api/linkedin/1/authorization/user",
+                defaults: new
+                {
+                    controller = "PluginLinkedIn",
+                    action = "LoadUsers"
+                }
+            );
 
-            //config.Routes.MapHttpRoute(
-            //    name: "PluginLinkedInLoadGroups",
-            //    routeTemplate: "plugins/api/linkedin/1/authorization/group",
-            //    defaults: new
-            //    {
-            //        controller = "PluginLinkedIn",
-            //        action = "LoadGroups"
-            //    }
-            //);
+            config.Routes.MapHttpRoute(
+                name: "PluginLinkedInLoadGroups",
+                routeTemplate: "plugins/api/linkedin/1/authorization/group",
+                defaults: new
+                {
+                    controller = "PluginLinkedIn",
+                    action = "LoadGroups"
+                }
+            );
 
-            //config.Routes.MapHttpRoute(
-            //    name: "PluginLinkedInLogin",
-            //    routeTemplate: "plugins/api/linkedin/1/authentication",
-            //    defaults: new
-            //    {
-            //        controller = "PluginLinkedIn",
-            //        action = "Login"
-            //    }
-            //);
+            config.Routes.MapHttpRoute(
+                name: "PluginLinkedInLogin",
+                routeTemplate: "plugins/api/linkedin/1/authentication",
+                defaults: new
+                {
+                    controller = "PluginLinkedIn",
+                    action = "Login"
+                }
+            );
 
             //config.Routes.MapHttpRoute(
             //    name: "PluginLinkedInLoad",

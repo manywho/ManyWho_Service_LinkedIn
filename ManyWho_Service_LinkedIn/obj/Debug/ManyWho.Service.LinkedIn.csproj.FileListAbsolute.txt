@@ -28,3 +28,4 @@ C:\GitHub\ManyWho_Service_LinkedIn\ManyWho_Service_LinkedIn\bin\System.Web.WebPa
 C:\GitHub\ManyWho_Service_LinkedIn\ManyWho_Service_LinkedIn\bin\System.Web.WebPages.Razor.xml
 C:\GitHub\ManyWho_Service_LinkedIn\ManyWho_Service_LinkedIn\obj\Debug\ManyWho_Service_LinkedIn.dll
 C:\GitHub\ManyWho_Service_LinkedIn\ManyWho_Service_LinkedIn\obj\Debug\ManyWho_Service_LinkedIn.pdb
+C:\GitHub\ManyWho_Service_LinkedIn\ManyWho_Service_LinkedIn\obj\Debug\ManyWho.Service.LinkedIn.csprojResolveAssemblyReference.cache

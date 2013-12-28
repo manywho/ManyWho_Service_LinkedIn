@@ -4,6 +4,7 @@ using System.Linq;
 using System.Xml;
 using System.IO;
 using System.Net;
+using System.Web;
 using System.Net.Http;
 using System.Web.Http;
 using System.Threading.Tasks;
@@ -30,7 +31,7 @@ using ManyWho.Service.LinkedIn.Models;
 
 namespace ManyWho.Service.LinkedIn.Controllers
 {
-    public class PluginLinkedInController : ApiController
+    public class PluginLinkedInController : GenericController
     {
         public const Int32 MAXIMUM_RETRIES = 3;
 
@@ -476,7 +477,8 @@ namespace ManyWho.Service.LinkedIn.Controllers
             String adminEmail = null;
             String loginUrl = null;
 
-            //authenticatedWho = this.GetWho();
+            // Grab the authenticated who from the header
+            authenticatedWho = this.GetWho();
 
             try
             {
@@ -508,8 +510,13 @@ namespace ManyWho.Service.LinkedIn.Controllers
                 // TODO: Should really get the culture that the authenticated user is running under
                 objectDataResponseAPI.culture = objectDataRequestAPI.culture;
 
+                // Create the login URL for linkedin, so the engine knows where to send the user to authenticate
+                // We automatically add the "state" parameter so we can properly track the oauth2 authentication
+                loginUrl = String.Format("https://www.linkedin.com/uas/oauth2/authorization?response_type=code&client_id={0}&scope={1}", clientId, scope);
+
                 if (authenticatedWho.Token != null &&
-                    authenticatedWho.Token.Trim().Length > 0)
+                    authenticatedWho.Token.Trim().Length > 0 &&
+                    authenticatedWho.Token.Equals(ManyWhoConstants.AUTHENTICATED_USER_PUBLIC_TOKEN, StringComparison.InvariantCultureIgnoreCase) == false)
                 {
                     LinkedInBasicProfileResultAPI linkedInProfileResultAPI = null;
 
@@ -539,10 +546,6 @@ namespace ManyWho.Service.LinkedIn.Controllers
                 }
                 else
                 {
-                    // Create the login URL for linkedin, so the engine knows where to send the user to authenticate
-                    // We automatically add the "state" parameter so we can properly track the oauth2 authentication
-                    loginUrl = String.Format("https://www.linkedin.com/uas/oauth2/authorization?response_type=code&client_id={0}&scope={1)", clientId, scope);
-
                     // Create the user object to respond with
                     userObject = new ObjectAPI();
                     userObject.developerName = ManyWhoConstants.MANYWHO_USER_DEVELOPER_NAME;
@@ -576,13 +579,90 @@ namespace ManyWho.Service.LinkedIn.Controllers
         }
 
         [HttpPost]
+        [ActionName("LoadUsers")]
+        public ObjectDataResponseAPI LoadUsers(ObjectDataRequestAPI objectDataRequestAPI)
+        {
+            try
+            {
+                return null;
+            }
+            catch (Exception exception)
+            {
+                throw ErrorUtils.GetWebException(HttpStatusCode.BadRequest, exception);
+            }
+        }
+
+        [HttpPost]
+        [ActionName("LoadUserAttributes")]
+        public ObjectDataResponseAPI LoadUserAttributes(ObjectDataRequestAPI objectDataRequestAPI)
+        {
+            ObjectDataResponseAPI objectDataResponseAPI = null;
+            List<ObjectAPI> attributeObjects = null;
+
+            try
+            {
+                // Populate the list of available attributes
+                attributeObjects = new List<ObjectAPI>();
+                attributeObjects.Add(this.CreateAttributeObject("All", "All"));
+
+                // Send the attributes back in the object data
+                objectDataResponseAPI = new ObjectDataResponseAPI();
+                objectDataResponseAPI.objectData = attributeObjects;
+
+                return objectDataResponseAPI;
+            }
+            catch (Exception exception)
+            {
+                throw ErrorUtils.GetWebException(HttpStatusCode.BadRequest, exception);
+            }
+        }
+
+        [HttpPost]
+        [ActionName("LoadGroups")]
+        public ObjectDataResponseAPI LoadGroups(ObjectDataRequestAPI objectDataRequestAPI)
+        {
+            try
+            {
+                return null;
+            }
+            catch (Exception exception)
+            {
+                throw ErrorUtils.GetWebException(HttpStatusCode.BadRequest, exception);
+            }
+        }
+
+        [HttpPost]
+        [ActionName("LoadGroupAttributes")]
+        public ObjectDataResponseAPI LoadGroupAttributes(ObjectDataRequestAPI objectDataRequestAPI)
+        {
+            ObjectDataResponseAPI objectDataResponseAPI = null;
+            List<ObjectAPI> attributeObjects = null;
+
+            try
+            {
+                // Populate the list of available attributes
+                attributeObjects = new List<ObjectAPI>();
+                attributeObjects.Add(this.CreateAttributeObject("All", "All"));
+
+                // Send the attributes back in the object data
+                objectDataResponseAPI = new ObjectDataResponseAPI();
+                objectDataResponseAPI.objectData = attributeObjects;
+
+                return objectDataResponseAPI;
+            }
+            catch (Exception exception)
+            {
+                throw ErrorUtils.GetWebException(HttpStatusCode.BadRequest, exception);
+            }
+        }
+
+        [HttpPost]
         [ActionName("Login")]
         public AuthenticatedWhoResultAPI Login(AuthenticationCredentialsAPI authenticationCredentialsAPI)
         {
             AuthenticatedWhoResultAPI authenticatedWhoResultAPI = null;
             LinkedInAuthenticationResultAPI linkedInAuthenticationResultAPI = null;
             LinkedInBasicProfileResultAPI linkedInProfileResultAPI = null;
-            IAuthenticatedWho authenticatedWho = null;
             HttpResponseMessage httpResponseMessage = null;
             HttpClient httpClient = null;
             String clientId = null;
@@ -590,16 +670,8 @@ namespace ManyWho.Service.LinkedIn.Controllers
             String adminEmail = null;
             String loginUrl = null;
 
-            // Grab the authenticated who from the header
-            //authenticatedWho = this.GetWho();
-
             try
             {
-                if (authenticatedWho == null)
-                {
-                    throw ErrorUtils.GetWebException(HttpStatusCode.BadRequest, "AuthenticatedWho object cannot be null.");
-                }
-
                 if (authenticationCredentialsAPI == null)
                 {
                     throw ErrorUtils.GetWebException(HttpStatusCode.BadRequest, "AuthenticationCredentialsAPI object cannot be null.");
@@ -617,7 +689,7 @@ namespace ManyWho.Service.LinkedIn.Controllers
                 adminEmail = SettingUtils.GetConfigurationValue(SERVICE_VALUE_ADMIN_EMAIL, authenticationCredentialsAPI.configurationValues, true);
 
                 // Create the Url for the final verification piece of the oauth request
-                loginUrl = String.Format("https://www.linkedin.com/uas/oauth2/accessToken?grant_type=authorization_code&code={0}&redirect_uri={1}&client_id={2}&client_secret={3}", authenticationCredentialsAPI.code, authenticationCredentialsAPI.redirectUri, clientId, clientSecret);
+                loginUrl = String.Format("https://www.linkedin.com/uas/oauth2/accessToken?grant_type=authorization_code&code={0}&redirect_uri={1}&client_id={2}&client_secret={3}", authenticationCredentialsAPI.code, HttpUtility.UrlEncode(authenticationCredentialsAPI.redirectUri), clientId, clientSecret);
 
                 // We enclose the request in a for loop to handle http errors
                 for (int i = 0; i < MAXIMUM_RETRIES; i++)
@@ -628,7 +700,7 @@ namespace ManyWho.Service.LinkedIn.Controllers
                         httpClient = new HttpClient();
 
                         // Call the get method on the chatter API to grab the user information
-                        httpResponseMessage = httpClient.PostAsync(loginUrl, null).Result;
+                        httpResponseMessage = httpClient.PostAsync(loginUrl, new StringContent("")).Result;
 
                         // Check the status of the response and respond appropriately
                         if (httpResponseMessage.IsSuccessStatusCode)
@@ -642,13 +714,13 @@ namespace ManyWho.Service.LinkedIn.Controllers
                         else
                         {
                             // Make sure we handle the lack of success properly
-                            HttpUtils.HandleUnsuccessfulHttpResponseMessage(authenticatedWho, i, adminEmail, "PluginLinkedInController.Login", httpResponseMessage, loginUrl);
+                            HttpUtils.HandleUnsuccessfulHttpResponseMessage(null, i, adminEmail, "PluginLinkedInController.Login", httpResponseMessage, loginUrl);
                         }
                     }
                     catch (Exception exception)
                     {
                         // Make sure we handle the exception properly
-                        HttpUtils.HandleHttpException(authenticatedWho, i, adminEmail, "PluginLinkedInController.Login", exception, loginUrl);
+                        HttpUtils.HandleHttpException(null, i, adminEmail, "PluginLinkedInController.Login", exception, loginUrl);
                     }
                     finally
                     {
@@ -658,7 +730,7 @@ namespace ManyWho.Service.LinkedIn.Controllers
                 }
 
                 // Get the profile for this user
-                linkedInProfileResultAPI = this.GetUserProfile(authenticatedWho, adminEmail, linkedInAuthenticationResultAPI.access_token);
+                linkedInProfileResultAPI = this.GetUserProfile(null, adminEmail, linkedInAuthenticationResultAPI.access_token);
 
                 // Create the authenticated who result to send back to manywho
                 authenticatedWhoResultAPI = new AuthenticatedWhoResultAPI();
@@ -671,6 +743,9 @@ namespace ManyWho.Service.LinkedIn.Controllers
                 authenticatedWhoResultAPI.token = linkedInAuthenticationResultAPI.access_token;
                 authenticatedWhoResultAPI.userId = linkedInProfileResultAPI.id;
                 authenticatedWhoResultAPI.username = linkedInProfileResultAPI.emailAddress;
+                authenticatedWhoResultAPI.email = linkedInProfileResultAPI.emailAddress;
+                authenticatedWhoResultAPI.firstName = linkedInProfileResultAPI.firstName;
+                authenticatedWhoResultAPI.lastName = linkedInProfileResultAPI.lastName;
             }
             catch (Exception exception)
             {
@@ -686,9 +761,10 @@ namespace ManyWho.Service.LinkedIn.Controllers
             HttpResponseMessage httpResponseMessage = null;
             HttpClient httpClient = null;
             String requestUrl = null;
+            String xml = null;
 
             // Now we want to grab the basic information about this user from their profile
-            requestUrl = String.Format("http://api.linkedin.com/v1/people/~?oauth2_access_token={0}", accessToken);
+            requestUrl = String.Format("https://api.linkedin.com/v1/people/~:(id,first-name,last-name,email-address)?oauth2_access_token={0}", accessToken);
 
             // We enclose the request in a for loop to handle http errors
             for (int i = 0; i < MAXIMUM_RETRIES; i++)
@@ -705,7 +781,10 @@ namespace ManyWho.Service.LinkedIn.Controllers
                     if (httpResponseMessage.IsSuccessStatusCode)
                     {
                         // Grab the response from LinkedIn
-                        linkedInProfileResultAPI = httpResponseMessage.Content.ReadAsAsync<LinkedInBasicProfileResultAPI>().Result;
+                        xml = httpResponseMessage.Content.ReadAsStringAsync().Result;
+
+                        // Parse the xml back to an object
+                        linkedInProfileResultAPI = this.ParseBasicProfile(xml);
 
                         // We successfully executed the request, we can break out of the retry loop
                         break;
@@ -731,6 +810,32 @@ namespace ManyWho.Service.LinkedIn.Controllers
             return linkedInProfileResultAPI;
         }
 
+        private LinkedInBasicProfileResultAPI ParseBasicProfile(String xml)
+        {
+            LinkedInBasicProfileResultAPI linkedInBasicProfileResultAPI = null;
+            XmlDocument xmlDoc = null;
+            //XmlNodeList nodeList = null;
+
+            if (xml != null &&
+                xml.Trim().Length > 0)
+            {
+                // Load the base XML document    
+                xmlDoc = new XmlDocument();
+                xmlDoc.LoadXml(xml);
+
+                // Create the new profile object
+                linkedInBasicProfileResultAPI = new LinkedInBasicProfileResultAPI();
+
+                // Get the values directly out of the document
+                linkedInBasicProfileResultAPI.id = xmlDoc.SelectSingleNode("/person/id").InnerText;
+                linkedInBasicProfileResultAPI.firstName = xmlDoc.SelectSingleNode("/person/first-name").InnerText;
+                linkedInBasicProfileResultAPI.lastName = xmlDoc.SelectSingleNode("/person/last-name").InnerText;
+                linkedInBasicProfileResultAPI.emailAddress = xmlDoc.SelectSingleNode("/person/email-address").InnerText;
+            }
+
+            return linkedInBasicProfileResultAPI;
+        }
+
         /// <summary>
         /// Utility method for creating new properties.
         /// </summary>
@@ -743,6 +848,31 @@ namespace ManyWho.Service.LinkedIn.Controllers
             propertyAPI.contentValue = contentValue;
 
             return propertyAPI;
+        }
+
+        private ObjectAPI CreateAttributeObject(String label, String value)
+        {
+            ObjectAPI attributeObject = null;
+            PropertyAPI attributeProperty = null;
+
+            attributeObject = new ObjectAPI();
+            attributeObject.externalId = value;
+            attributeObject.developerName = ManyWhoConstants.AUTHENTICATION_AUTHENTICATION_ATTRIBUTE_OBJECT_DEVELOPER_NAME;
+            attributeObject.properties = new List<PropertyAPI>();
+
+            attributeProperty = new PropertyAPI();
+            attributeProperty.developerName = ManyWhoConstants.AUTHENTICATION_ATTRIBUTE_LABEL;
+            attributeProperty.contentValue = label;
+
+            attributeObject.properties.Add(attributeProperty);
+
+            attributeProperty = new PropertyAPI();
+            attributeProperty.developerName = ManyWhoConstants.AUTHENTICATION_ATTRIBUTE_VALUE;
+            attributeProperty.contentValue = value;
+
+            attributeObject.properties.Add(attributeProperty);
+
+            return attributeObject;
         }
     }
 }
